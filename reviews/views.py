@@ -82,9 +82,9 @@ def publisher_edit(request, pk=None):
     if form.is_valid():
       updated_publisher = form.save()
     if publisher:
-      messages.success(request, f"Publisher '{updated_publisher}' was created.")
-    else:
       messages.success(request, f"Publisher '{updated_publisher}' was updated.")
+    else:
+      messages.success(request, f"Publisher '{updated_publisher}' was created.")
     return redirect("publisher-edit", updated_publisher.pk)
   else:
     if not publisher:
