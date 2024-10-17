@@ -1,0 +1,33 @@
+{% extends '../layouts/base.html' %}
+
+{% block body %}
+<h1>Book Review application</h1>
+<hr>
+<ul>
+  {% for book in books %}
+  <li>
+    <span class="text-info">Title: </span>
+    <span>{{ book.title }}</span>
+    <br>
+    <span class="text-info">Publisher: </span>
+    <span>{{ book.publisher }}</span>
+    <br>
+    <span class="text-info">Publication Date: </span>
+    <span>{{ book.publication_date }}</span>
+    <br>
+    <span class="text-info">Rating: </span>
+    <span>{{ book.book_rating }}</span>
+    <br>
+    <span class="text-info">Number of reviews: </span>
+    <span class="badge badge-primary badge-pill">{{ book.number_of_reviews }}</span>
+    <br>
+    {% if not book.book_rating %}
+    <span class="text-secondary">Provide a rating and write the first review for this book.</span>
+    <br>
+    {% endif %}
+    <a href="/books/{{book.id}}/" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Reviews</a>
+  </li>
+<br>
+  {% endfor %}
+</ul>
+{% endblock %}

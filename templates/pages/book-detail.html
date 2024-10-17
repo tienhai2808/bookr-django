@@ -1,0 +1,50 @@
+{% extends '../layouts/base.html' %}
+
+{% block body %}
+<h2 class="mt-3">Book Details</h2>
+<hr>
+<span class="text-info">Title: </span>
+<span>{{ book.title }}</span>
+<br>
+<span class="text-info">Publisher: </span>
+<span>{{ book.publisher }}</span>
+<br>
+<span class="text-info">Publication Date: </span>
+<span>{{ book.publication_date }}</span>
+<br>
+{% if book.avg_rating %}
+<span class="text-info">Overall Rating: </span>
+<span class="badge badge-primary badge-pill">{{ book.avg_rating|floatformat:1 }}</span>
+<br>
+{% endif %}
+<hr>
+{% if book.review_set.all %}
+<h2 class="mt-3">Review Comments</h2>
+{% for review in book.review_set.all %}
+<div class="d-flex justify-content-center mb-2">
+  <ul class="list-group list-group-flush" style="width: 95%;">
+    <li class="border rounded list-group-item">
+      <span class="text-info">Review Comment: </span>
+      <span>{{ review.content }}</span>
+      <br>
+      <span class="text-info">Created on: </span>
+      <span>{{ review.date_created }}</span>
+      <br>
+      <span class="text-info">Modified on: </span>
+      <span>{{ review.date_edited }}</span>
+      <br>
+      <span class="text-info">Rating: </span>
+      <span class="badge badge-secondary badge-pill">{{ review.rating }}</span>
+      <br>
+      <span class="text-info">Creator: </span>
+      <span>{{ review.creator }}</span>
+      <br>
+    </li>
+    <a style="text-decoration: none; padding-bottom: 5px;" href="/books/{{ book.id }}/reviews/{{ review.id }}/">Edit Review</a>
+  </ul>
+</div>
+{% endfor %}
+{% endif %}
+<a class="btn btn-primary" href="/books/{{ book.id }}/reviews/new/">Add Review</a>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends '../layouts/base.html' %}
+
+{% block body %}
+<h2>Search for Books</h2>
+<form action="">
+  {{ search_form.as_p }}
+  <button class="btn btn-primary">Search</button>
+</form>
+
+{% if books %}
+<br>
+<h3>Search Results for <em>{{ search_text }}</em></h3>
+<ul style="list-style-type: none;">
+  {% for book in books %}
+  <li>
+    <span class="text-info">Title: </span>
+    <a style="text-decoration: none;" href="/books/{{ book.id }}/">{{ book.title }}</a>
+    <br>
+    {% for bookcontributor in book.bookcontributor_set.all %}
+    <span class="text-info">Contributor: </span>
+    <span>{{ bookcontributor.contributor.first_names }} {{ bookcontributor.contributor.last_names }}</span>
+    <span class="text-info">Role: </span>
+    <span>{{ bookcontributor.get_role_display }}</span>
+    <br>
+    {% endfor %}
+  </li>
+<br>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if search_text and not books %}
+<br>
+<h3>No results found</h3>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top">
+  <a class="navbar-brand" href="/">
+    <img src="https://raw.githubusercontent.com/PacktPublishing/Web-Development-with-Django-Second-Edition/refs/heads/main/Chapter07/Exercise7.03/bookr/reviews/static/reviews/logo.png" 
+    alt="Logo"
+    height="60px">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/books/">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Logout</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" action="/book-search/">
+      <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" minlength="3" value="{{ search_text }}">
+      <input type="hidden" name="search_in" value="Title">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+<style type="text/css">
+  .navbar {
+    min-height: 100px;
+    font-size: 25px;
+  }
+  .navbar-brand {
+    font-size: 25px;
+  }
+</style>
