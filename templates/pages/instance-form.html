@@ -3,12 +3,12 @@
 {% block body %}
 <h2>
   {% if instance %}
-  Editing {{ model_type }} <em>{{instance.name}}</em>
+  Editing {{ model_type }} <em>{% if related_instance %} {{ related_instance.title}} {% else %} {{ instance }} {% endif %}</em>
   {% else %}
-  New {{ model_type }}
+  New {{ model_type }} <em>{% if related_instance %} {{ related_instance.title }} {% endif %}</em>
   {% endif %}
 </h2>
-{% if related_instance and related_model_type %}
+{% if related_instance %}
 <p>For {{ related_model_type }} <em>{{ related_instance }}</em></p>
 {% endif %}
 <form method="POST">

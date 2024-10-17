@@ -115,7 +115,7 @@ def review_edit(request, book_pk, review_pk=None):
       return redirect('book-detail', int=book_pk)
   else:
     if not review:
-      title = "New Review"
+      title = f"New Review for {book.title}"
     else:
       title = f"Edit Review for {book.title}"
     form = ReviewForm(instance=review)
