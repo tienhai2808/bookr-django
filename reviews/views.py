@@ -85,7 +85,7 @@ def publisher_edit(request, pk=None):
       messages.success(request, f"Publisher '{updated_publisher}' was created.")
     else:
       messages.success(request, f"Publisher '{updated_publisher}' was updated.")
-    return redirect("publisher_edit", updated_publisher.pk)
+    return redirect("publisher-edit", updated_publisher.pk)
   else:
     if not publisher:
       title = "New Publisher"
