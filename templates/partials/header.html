@@ -16,9 +16,8 @@
         <a class="nav-link" href="#">Logout</a>
       </li>
     </ul>
-    <form class="form-inline my-2 my-lg-0" action="/book-search/">
+    <form class="form-inline my-2 my-lg-0" action="{% url 'search' %}">
       <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" minlength="3" value="{{ search_text }}">
-      <input type="hidden" name="search_in" value="Title">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
   </div>

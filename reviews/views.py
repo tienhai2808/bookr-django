@@ -20,11 +20,11 @@ def search(request):
     search_text = search_form.cleaned_data['search']
     search_in = search_form.cleaned_data['search_in']
     title = f"Search Results for '{search_text}'"
-    if search_in == 'Title':
-      books = Book.objects.filter(title__icontains=search_text)
-    else:
+    if search_in == 'Contributor':
       contributors = Contributor.objects.filter(Q(first_names__icontains=search_text)|Q(last_names__icontains=search_text))
       books = Book.objects.filter(contributor__in=contributors).distinct()
+    else:
+      books = Book.objects.filter(title__icontains=search_text)
     context = {'title': title, 'search_form': search_form, 'search_text':search_text, 'books': books}
   else:
     context = {'title': title, 'search_form': search_form}
@@ -96,30 +96,38 @@ def publisher_edit(request, pk=None):
                 {"method": request.method, "title": title, "model_type": "Publisher" ,"instance": publisher, "form": form})
 
 def review_edit(request, book_pk, review_pk=None):
-  book = get_object_or_404(Book, pk=book_pk)
-  if review_pk is not None:
-    review = get_object_or_404(Review, book_id=book_pk, pk=review_pk)
-  else:
-    review = None
-  if request.POST:
-    form = ReviewForm(request.POST, instance=review)
-    if form.is_valid():
-      updated_review = form.save(False)
-      updated_review.book = book
-      if review is None:
-        messages.success(request, f'Review for "{book}" created.')
-      else:
-        updated_review.date_edited = timezone.now()
-        messages.success(request, f'Review for "{book}" updated.')
-      updated_review.save()
-      return redirect('book-detail', int=book_pk)
-  else:
-    if not review:
-      title = f"New Review for {book.title}"
+  try:
+    book = Book.objects.get(pk=book_pk)
+    if review_pk is not None:
+      try:
+        review = Review.objects.get(book_id=book_pk, pk=review_pk)
+      except Review.DoesNotExist:
+        messages.error(request, 'Không tìm thấy kreview')
+        return redirect('book-list')     
     else:
-      title = f"Edit Review for {book.title}"
-    form = ReviewForm(instance=review)
-  return render(request, "pages/instance-form.html",
-                {"method": request.method, "title": title, "related_model_type": "Book", "related_instance": book,
-                 "model_type": "Review" ,"instance": review, "form": form})
+      review = None
+    if request.POST:
+      form = ReviewForm(request.POST, instance=review)
+      if form.is_valid():
+        updated_review = form.save(False)
+        updated_review.book = book
+        if review is None:
+          messages.success(request, f'Review for "{book}" created.')
+        else:
+          updated_review.date_edited = timezone.now()
+          messages.success(request, f'Review for "{book}" updated.')
+        updated_review.save()
+        return redirect('book-detail', book_pk)
+    else:
+      if not review:
+        title = f"New Review for {book.title}"
+      else:
+        title = f"Edit Review for {book.title}"
+      form = ReviewForm(instance=review)
+    return render(request, "pages/instance-form.html",
+                  {"method": request.method, "title": title, "related_model_type": "Book", "related_instance": book,
+                  "model_type": "Review" ,"instance": review, "form": form})
+  except Book.DoesNotExist:
+    messages.error(request, 'Không tìm thấy cuốn sách')
+    return redirect('book-list')
   

@@ -21,7 +21,7 @@ SEARCH_TYPES = (
 )
 class SearchForm(forms.Form):
   search = forms.CharField(min_length=3, required=False)
-  search_in = forms.ChoiceField(choices=SEARCH_TYPES, widget=forms.Select)
+  search_in = forms.ChoiceField(choices=SEARCH_TYPES, required=False,widget=forms.Select)
 
 # def validate_email_domain(value):
 #   if value.split("@")[-1].lower() != "example.com":
