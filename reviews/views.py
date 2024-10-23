@@ -102,7 +102,7 @@ def review_edit(request, book_pk, review_pk=None):
       try:
         review = Review.objects.get(book_id=book_pk, pk=review_pk)
       except Review.DoesNotExist:
-        messages.error(request, 'Không tìm thấy kreview')
+        messages.error(request, 'Không tìm thấy review')
         return redirect('book-list')     
     else:
       review = None
