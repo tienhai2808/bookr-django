@@ -11,11 +11,11 @@
 {% if related_instance %}
 <p>For {{ related_model_type }} <em>{{ related_instance }}</em></p>
 {% endif %}
-<form method="POST">
+<form method="post" {% if is_file_upload %} enctype="multipart/form-data" {% endif %}>
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit" class="btn btn-primary">
-    {% if instance %}Save{% else %}Create{% endif %}
+      {% if instance %}Save{% else %}Create{% endif %}
   </button>
 </form>
 {% endblock %}

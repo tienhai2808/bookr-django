@@ -3,9 +3,14 @@ from .models import Book, Contributor, Publisher, Review
 from .utils import average_rating
 from django.db.models import Sum, Q, Count
 from django.contrib import messages
-from .forms import  PublisherForm, SearchForm, ReviewForm
+from .forms import  *
 from django.contrib import messages
 from django.utils import timezone
+from io import BytesIO
+from PIL import Image
+from django.core.files.images import ImageFile
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied 
 
 # Create your views here.
 
@@ -43,7 +48,6 @@ def book_list(request):
       book.number_of_reviews = 0
   return render(request, 'pages/book-list.html', {'books': books, 'title': title})
 
-
 def book_detail(request, int):
   try:
     book = Book.objects.get(id=int)
@@ -63,14 +67,6 @@ def book_detail(request, int):
   context = {'title': title,
               'book': book}
   return render(request, 'pages/book-detail.html', context)
-
-# def form_example(request):
-#   initial = {"email": "user@example.com"}
-#   if request.POST:
-#     form = OrderForm(request.POST,  initial=initial)
-#   else:
-#     form = OrderForm( initial=initial)
-#   return render(request, 'pages/form_example.html', {'method': request.method, 'form': form})
 
 def publisher_edit(request, pk=None):
   if pk is not None:
@@ -92,15 +88,17 @@ def publisher_edit(request, pk=None):
     else:
       title = f"Edit Publisher {publisher}"
     form = PublisherForm(instance=publisher)
-  return render(request, "pages/instance-form.html",
-                {"method": request.method, "title": title, "model_type": "Publisher" ,"instance": publisher, "form": form})
+  return render(request, "pages/instance-form.html", {"method": request.method, "title": title, "model_type": "Publisher" ,"instance": publisher, "form": form})
 
+@login_required 
 def review_edit(request, book_pk, review_pk=None):
   try:
     book = Book.objects.get(pk=book_pk)
     if review_pk is not None:
       try:
         review = Review.objects.get(book_id=book_pk, pk=review_pk)
+        if not request.user.is_staff and review.creator.id != request.user.id:
+          raise PermissionDenied
       except Review.DoesNotExist:
         messages.error(request, 'Không tìm thấy review')
         return redirect('book-list')     
@@ -130,4 +128,31 @@ def review_edit(request, book_pk, review_pk=None):
   except Book.DoesNotExist:
     messages.error(request, 'Không tìm thấy cuốn sách')
     return redirect('book-list')
-  
+
+@login_required 
+def book_media(request, id_book):
+  try:
+    book = Book.objects.get(id=id_book)
+    title = f'Edit Book {book}'
+    form = BookMediaForm(request.POST or None, request.FILES or None, instance=book)
+    if request.POST:
+      if form.is_valid():
+        book = form.save(False)
+        cover = form.cleaned_data.get("cover")
+        if cover and not hasattr(cover, "path"):
+          image = Image.open(cover)
+          image.thumbnail((300, 300))
+          image_data = BytesIO() #Tạo luồng bộ nhớ tạm RAM
+          image.save(fp=image_data, format=cover.image.format) #Lưu ảnh vào bộ nhớ tạm với đúng đinh dạng ban đầu
+          image_file = ImageFile(image_data) #Tạo file ảnh từ bộ nhớ tạm
+          book.cover.save(cover.name, image_file) #Lưu vào csdl với tên và lưu file ảnh vào folder media
+        book.save()
+        messages.success(request, f'Sách "{book}" đã được cập nhật thành công.')
+        return redirect('book-detail', book.id)
+    return render(request, "pages/instance-form.html", {"instance": book, "form": form, "model_type": "Book", 'title': title, "is_file_upload": True})
+  except Book.DoesNotExist:
+    return redirect('book-list')
+
+def profile(request):
+  title = 'Bookr'
+  return render(request, 'pages/profile.html', {'title': title})

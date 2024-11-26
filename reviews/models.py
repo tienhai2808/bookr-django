@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import auth
+from django.utils.text import slugify
 
 
 # Create your models here.
@@ -17,23 +18,27 @@ class Contributor(models.Model):
   last_names = models.CharField(max_length=50, help_text="The contributor's last name or names.")
   email = models.EmailField(help_text="The contact email for the contributor.")
   
-  def initialled_name(self):
-    initials = ''.join([name[0].upper() for name in self.first_names.split()])
-    return f"{self.last_names}, {initials}"
-  
   def __str__(self):
-    return self.initialled_name()
+    return f"{self.first_names} {self.last_names}"
   
   
 class Book(models.Model):
   title = models.CharField(max_length=70, help_text="The title of the book")
+  slug = models.SlugField(max_length=70, null=True, blank=True)
+  cover = models.ImageField(upload_to='book_covers/', blank=True, null=True)
+  sample = models.FileField(upload_to='book_samples/', blank=True, null=True)
   publication_date = models.DateField(verbose_name="Date the book was published.")
   isbn = models.CharField(max_length=20, verbose_name="ISBN number of the book.")
   publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
   contributor = models.ManyToManyField(Contributor, through="BookContributor")
   
   def __str__(self):
-    return "{} ({})".format(self.title, self.isbn)
+    return f"{self.title} ({self.isbn})"
+  
+  def save(self, *args, **kwargs):
+    if not self.slug:
+      self.slug = slugify(self.title)
+    super(Book, self).save(*args, **kwargs)
 
   
 class BookContributor(models.Model):

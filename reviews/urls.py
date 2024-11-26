@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'books', BookViewSet)
 router.register(r'reviews', ReviewViewSet)
+router.register(r'contributors', ContributorViewSet)
 
 
 urlpatterns = [
@@ -16,6 +17,8 @@ urlpatterns = [
   path("publishers/new/", publisher_edit, name="publisher-create"),
   path('books/<int:book_pk>/reviews/<int:review_pk>/', review_edit, name='review-edit'),
   path('books/<int:book_pk>/reviews/new/', review_edit, name='review-create'),
+  path("books/<int:id_book>/media/", book_media, name="book_media"),
+  path('accounts/profile/', profile, name='profile'),
   path('api/', include((router.urls, 'api'))),
   path('api/login/', Login.as_view(), name='login')
 ]

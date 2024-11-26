@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied
-from .models import Book, Publisher, Review
+from .models import *
 from .utils import average_rating
 
 
@@ -48,24 +48,49 @@ class ReviewSerializer(serializers.ModelSerializer):
   
 class BookSerializer(serializers.ModelSerializer):
   publisher = PublisherSerializer()
-  rating = serializers.SerializerMethodField('book_rating')
-  reviews = serializers.SerializerMethodField('book_reviews')
+  rating = serializers.SerializerMethodField()
+  reviews = serializers.SerializerMethodField()
   
   class Meta:
     model = Book
     fields = ['title', 'publication_date', 'isbn', 'publisher', 'rating', 'reviews']
   
-  def book_rating(self, book):
+  def get_rating(self, book):
     reviews = book.review_set.all()
     if reviews:
       return average_rating([review.rating for review in reviews])
     else:
       None
       
-  def book_reviews(self, book):
+  def get_reviews(self, book):
     reviews = book.review_set.all()
     if reviews:
       return ReviewSerializer(reviews, many=True).data
     else:
       None
+
+
+class BookForContributorSerializer(serializers.ModelSerializer):
+  publisher = PublisherSerializer()
+  class Meta:
+    model = Book
+    fields = ['title', 'publication_date', 'isbn', 'publisher']
+ 
+
+class ContributionSerializer(serializers.ModelSerializer):
+  book = BookForContributorSerializer()
+  class Meta:
+    model = BookContributor
+    fields = ['book', 'role']
+
+
+class ContributorSerializer(serializers.ModelSerializer):
+  bookcontributor_set = ContributionSerializer(many=True)
+  number_books = serializers.SerializerMethodField()
+  
+  class Meta:
+    model = Contributor
+    fields = ['first_names', 'last_names', 'email', 'bookcontributor_set', 'number_books']
     
+  def get_number_books(self, contributor):
+    return contributor.bookcontributor_set.count()

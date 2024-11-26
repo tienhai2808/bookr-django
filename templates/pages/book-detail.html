@@ -3,6 +3,15 @@
 {% block body %}
 <h2 class="mt-3">Book Details</h2>
 <hr>
+{% if book.cover %}
+<img src="{{ book.cover.url }}" alt="Book Thumbnail">
+<br>
+{% endif %}
+{% if book.sample %}
+<span class="text-info">Sample: </span>
+<span><a href="{{ book.sample.url }}">Download</a></span>
+<br>
+{% endif %}
 <span class="text-info">Title: </span>
 <span>{{ book.title }}</span>
 <br>
@@ -46,5 +55,6 @@
 {% endfor %}
 {% endif %}
 <a class="btn btn-primary" href="/books/{{ book.id }}/reviews/new/">Add Review</a>
+<a class="btn btn-primary" href="media/">Media</a>
 
 {% endblock %}

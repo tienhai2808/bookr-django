@@ -1,0 +1,15 @@
+{% extends "layouts/base.html" %}
+
+{% block body %}
+<h2>Profile</h2>
+<div>
+  <p>
+  Username: {{ user.username }} <br>
+  Name: {{ user.first_name }}
+  {{ user.last_name }}<br>
+  Date Joined: {{ user.date_joined }} <br>
+  Email: {{ user.email }}<br>
+  Last Login: {{ user.last_login }}<br>
+  </p>
+</div>
+{% endblock %}
