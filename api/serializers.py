@@ -22,15 +22,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     
 class UserSerializer(serializers.ModelSerializer):
   old_password = serializers.CharField(write_only=True, required=False)
-  reviewed = serializers.SerializerMethodField('user_reviewed')
+  reviewed = serializers.SerializerMethodField()
   
   class Meta:
     model = User
-    fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'reviewed','old_password']
+    fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'reviewed', 'old_password']
     extra_kwargs = {"password": {"write_only": True, "style": {"input_type": "password"}, "required": False}, 
                     "old_password": {"style": {"input_type": "mail"}}}
     
-  def user_reviewed(self, user):
+  def get_reviewed(self, user):
     reviews = user.review_set.all()
     return ReviewForUserSerializer(reviews, many=True).data
     
@@ -65,7 +65,7 @@ class ReviewForUserSerializer(serializers.ModelSerializer):
 
 
 class PublisherSerializer(serializers.ModelSerializer):  
-  books = serializers.SerializerMethodField('get_books')
+  books = serializers.SerializerMethodField()
   
   class Meta:
     model = Publisher
@@ -108,25 +108,25 @@ class ReviewForBookSerializer(serializers.ModelSerializer):
   
 class BookForPublisherSerializer(serializers.ModelSerializer):
   publisher = serializers.StringRelatedField(read_only=True)
-  rating = serializers.SerializerMethodField('book_rating')
-  reviews = serializers.SerializerMethodField('book_reviews')
-  contributors = serializers.SerializerMethodField('book_contributors')
+  rating = serializers.SerializerMethodField()
+  reviews = serializers.SerializerMethodField()
+  contributors = serializers.SerializerMethodField()
   
   class Meta:
     model = Book
-    fields = ['id', 'title', 'slug','publication_date', 'isbn', 'publisher', 'rating', 'reviews', 'contributors']
-  
-  def book_rating(self, book):
+    fields = ['id', 'title', 'slug','publication_date', 'cover', 'isbn', 'publisher', 'rating', 'reviews', 'contributors']
+      
+  def get_rating(self, book):
     reviews = book.review_set.all()
     if reviews:
       return average_rating([review.rating for review in reviews])
     else:
       None
       
-  def book_reviews(self, book):
+  def get_reviews(self, book):
     reviews = book.review_set.all()
     return ReviewForBookSerializer(reviews, many=True).data
       
-  def book_contributors(self, book):
+  def get_contributors(self, book):
     contributors = book.bookcontributor_set.all()
     return BookContributorSerializer(contributors, many=True).data
